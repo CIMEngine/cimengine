@@ -1,0 +1,36 @@
+{
+  "name": "cimengine-build-tools",
+  "version": "1.0.0",
+  "description": "Geojson data processing tools for CIMEngine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "cimengine-build": "./GeoBuilder.js",
+    "cimengine-country-fix": "./CountryFixer.js",
+    "cimengine-init": "./ProjectInit.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CIMEngine/cimengine-build-tools.git"
+  },
+  "keywords": [
+    "cimengine",
+    "geojson",
+    "geo",
+    "map",
+    "tools",
+    "processing"
+  ],
+  "author": "artegoser",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CIMEngine/cimengine-build-tools/issues"
+  },
+  "homepage": "https://github.com/CIMEngine/cimengine-build-tools#readme",
+  "dependencies": {
+    "turf": "^3.0.14",
+    "yargs": "^17.7.2"
+  }
+}
