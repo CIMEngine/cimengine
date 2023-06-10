@@ -1,15 +1,15 @@
 {
   "name": "cimengine-build-tools",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Geojson data processing tools for CIMEngine",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "cimengine-build": "./GeoBuilder.js",
-    "cimengine-country-fix": "./CountryFixer.js",
-    "cimengine-init": "./ProjectInit.js"
+    "cimengine-build": "./tools/GeoBuilder.js",
+    "cimengine-country-fix": "./tools/CountryFixer.js",
+    "cimengine-init": "./tools/ProjectInit.js"
   },
   "repository": {
     "type": "git",
