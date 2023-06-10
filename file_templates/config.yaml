@@ -1,0 +1,11 @@
+# config is optional
+# ---
+# tags:
+#   - tags
+#   - for
+#   - polygon
+#   - selection
+# reProperty:
+#   new: "Properties"
+#   for: "Polygons"
+# cities: false
