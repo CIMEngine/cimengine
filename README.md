@@ -22,7 +22,7 @@ npm i cimengine-build-tools -g
 
 ### cimengine-init
 
-params: name - name of project
+params: name - name of project  
 usage: `cimengine-init --name map`
 
 ### cimengine-build
