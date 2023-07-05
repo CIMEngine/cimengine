@@ -379,16 +379,19 @@ if (config?.reProperty) {
   console.log();
 }
 
-console.log("Set new ids");
-console.time("Set new ids");
+console.log("Set new ids and area");
+console.time("Set new ids and area");
 
 let id = 0;
 geo.features = geo.features.map((val) => {
   val.id = id++;
+  val.properties.area = (turf.area(val) / 1000000)
+    .toFixed(2)
+    .replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, "$1 ");
   return val;
 });
 
-console.timeEnd("Set new ids");
+console.timeEnd("Set new ids and area");
 
 fs.writeFileSync(geofixConf.output, JSON.stringify(geo, null, "  "));
 console.timeEnd("Total");
