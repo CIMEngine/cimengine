@@ -385,9 +385,11 @@ console.time("Set new ids and area");
 let id = 0;
 geo.features = geo.features.map((val) => {
   val.id = id++;
-  val.properties.area = (turf.area(val) / 1000000)
-    .toFixed(2)
-    .replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, "$1 ");
+  if (val.geometry.type === "MultiPolygon") {
+    val.properties.area = (turf.area(val) / 1000000)
+      .toFixed(2)
+      .replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, "$1 ");
+  }
   return val;
 });
 
