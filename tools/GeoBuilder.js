@@ -43,12 +43,14 @@ for (country of layers) {
   );
 
   co_features.features = co_features.features.map((val) => {
-    if (val?.geometry?.type == "Polygon") {
+    if (val?.geometry?.type === "Polygon") {
       val.properties = {};
-    } else if (val?.geometry?.type == "MultiPolygon") {
+    } else if (val?.geometry?.type === "MultiPolygon") {
       console.error("Error: MultiPolygons are not allowed!");
       process.exit(1);
     }
+
+    return val;
   });
 
   fs.writeFileSync(
