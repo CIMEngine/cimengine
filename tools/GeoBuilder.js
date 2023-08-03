@@ -5,6 +5,7 @@ const fs = require("fs");
 const YAML = require("yaml");
 const _ = require("lodash");
 const path = require("node:path");
+const md5 = require("md5");
 
 const yargs = require("yargs/yargs");
 const { hideBin } = require("yargs/helpers");
@@ -25,15 +26,14 @@ const geofixConf = {
 };
 
 let layers = YAML.parse(fs.readFileSync(geofixConf.layers, "utf-8"));
-let countries_properties = YAML.parse(
-  fs.readFileSync(geofixConf.properties, "utf-8")
-);
+let countries_properties =
+  YAML.parse(fs.readFileSync(geofixConf.properties, "utf-8")) || {};
 let config = YAML.parse(fs.readFileSync(geofixConf.config, "utf-8"));
 
 let features = [];
 
 for (country of layers) {
-  let properties = countries_properties[country];
+  let properties = countries_properties[country] || {};
 
   let co_features = JSON.parse(
     fs.readFileSync(
@@ -58,10 +58,17 @@ for (country of layers) {
     JSON.stringify(co_features, null, "  ")
   );
 
+  if (!properties.fill) {
+    properties.fill = `#${md5(country).substring(0, 6)}`;
+  }
+
+  if (!properties.stroke) {
+    properties.stroke = `#${md5(country).substring(6, 12)}`;
+  }
+
   co_features = co_features.features;
 
-  features = [
-    ...features,
+  features.unshift(
     ...co_features.map((val) => {
       if (val.geometry.type == "Polygon") {
         val.properties = properties;
@@ -69,13 +76,13 @@ for (country of layers) {
       }
 
       return val;
-    }),
-  ];
+    })
+  );
 }
 
 let geo = {
   type: "FeatureCollection",
-  features: features.reverse(),
+  features,
 };
 
 geo.features = geo.features.filter((v) => v.properties.name);
