@@ -71,7 +71,7 @@ for (country of layers) {
   features.unshift(
     ...co_features.map((val) => {
       if (val.geometry.type == "Polygon") {
-        val.properties = properties;
+        val.properties = properties || {};
         val.properties.name = country;
       }
 
