@@ -1,6 +1,6 @@
 {
   "name": "cimengine-build-tools",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "description": "Geojson data processing tools for CIMEngine",
   "main": "index.js",
   "scripts": {
