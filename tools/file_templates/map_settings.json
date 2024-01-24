@@ -1,0 +1,5 @@
+{
+  "name": "Map name",
+  "geoURL": "link to geo.geojson",
+  "countryInfoURL": "link to countries.json"
+}

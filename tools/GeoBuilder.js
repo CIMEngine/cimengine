@@ -32,7 +32,7 @@ let config = YAML.parse(fs.readFileSync(geofixConf.config, "utf-8"));
 
 let features = [];
 
-for (country of layers) {
+for (let country of layers) {
   let properties = countries_properties[country] || {};
 
   let co_features = JSON.parse(

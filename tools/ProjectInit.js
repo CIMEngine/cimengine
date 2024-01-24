@@ -31,6 +31,10 @@ let roadSizesTemplate = fs.readFileSync(
   path.join(__dirname, "file_templates", "roadSizes.json")
 );
 
+let settingsTemplate = fs.readFileSync(
+  path.join(__dirname, "file_templates", "map_settings.json")
+);
+
 let name = args.name || "cime-project";
 
 let currpath = path.join(process.cwd(), name, "src");
@@ -43,6 +47,10 @@ fs.writeFileSync(path.join(currpath, "config.yaml"), configTemplate);
 fs.writeFileSync(path.join(currpath, "properties.yaml"), propertiesTemplate);
 fs.writeFileSync(path.join(currpath, "layers.yaml"), layersTemplate);
 fs.writeFileSync(path.join(currpath, "countries.json"), countriesTemplate);
+fs.writeFileSync(
+  path.join(currpath, "..", "map_settings.json"),
+  settingsTemplate
+);
 
 fs.writeFileSync(path.join(currpath, "roads", "sizes.json"), roadSizesTemplate);
 
