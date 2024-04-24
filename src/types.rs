@@ -35,7 +35,19 @@ pub enum Commands {
 #[derive(Debug, Subcommand)]
 pub enum NewCommands {
     /// Create new country
-    Country { name: String },
+    Country {
+        id: String,
+        #[clap(short, long)]
+        name: Option<String>,
+        #[clap(short, long)]
+        description: Option<String>,
+        #[clap(short, long)]
+        foundation_date: Option<String>,
+        #[clap(long)]
+        flag: Option<String>,
+        #[clap(short, long)]
+        about: Option<String>,
+    },
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -59,12 +71,13 @@ pub struct ProcessingConfig {
 
     tags: Option<ProcessingTagsConfig>,
     countries_rewrite: Option<CountryRewriteConfig>,
+    public: Option<PublicConfig>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ProcessingTagsConfig {
-    include: Vec<String>,
-    exclude: Vec<String>,
+    include: Option<Vec<String>>,
+    exclude: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -77,11 +90,18 @@ pub struct CountryRewriteConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Country {
+pub struct PublicConfig {
     name: String,
-    description: String,
-    foundation_date: String,
-    flag: String,
-    about: Option<String>,
-    tags: Option<Vec<String>>,
+    geo: String,
+    countries: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Country {
+    pub name: String,
+    pub description: String,
+    pub foundation_date: String,
+    pub flag: String,
+    pub about: Option<String>,
+    pub tags: Option<Vec<String>>,
 }

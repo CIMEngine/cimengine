@@ -10,22 +10,23 @@ geo_file = "geo.geojson"
 # generate_colors = false
 # show_markers = false
 
-# Include or exclude countries based on tags
-# Glob syntax is supported
-[[processing.tags]]
-include = [] # [] = not filtered
-# exclude = ["test", "test2"]
-
-# [[processing.countries_rewrite]]
-# name = "name"
-# color = "#000000"
-
 # Information for public repository in cimengine. See: https://github.com/CIMEngine/MapList
-# [[processing.public]]
+# [processing.public]
 # name = "Sample Map"
 # geo = "https://example.com/geo.geojson"
 # countries = "https://example.com/countries.json"
 
+# Include or exclude countries based on tags
+# Glob syntax is supported
+# [processing.tags]
+# include = [] # [] = not filtered
+# exclude = ["test", "test2"]
+
+# [processing.countries_rewrite]
+# name = "name"
+# color = "#000000"
+
+# Nature layers
 [[nature]]
 id = "water"
 color = "#75cff0"

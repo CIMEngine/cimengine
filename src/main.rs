@@ -2,6 +2,7 @@ use clap::Parser;
 
 mod build;
 mod init;
+mod new;
 mod types;
 
 use types::Commands;
@@ -12,6 +13,7 @@ fn main() {
     match args.cmd {
         Commands::Build => build::build(),
         Commands::Init { name } => init::init(name),
+        Commands::New { cmd } => new::new(cmd),
         _ => unimplemented!(),
     }
 }
