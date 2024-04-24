@@ -1,0 +1,39 @@
+[country]
+# Order matters when building countries. This affects the processing of area intersections
+layers = ["sample_country_id"]
+
+[[processing]]
+output_folder = "out"
+countries_file = "countries.json"
+geo_file = "geo.geojson"
+
+# generate_colors = false
+# show_markers = false
+
+# Include or exclude countries based on tags
+# Glob syntax is supported
+[[processing.tags]]
+include = [] # [] = not filtered
+# exclude = ["test", "test2"]
+
+# [[processing.countries_rewrite]]
+# name = "name"
+# color = "#000000"
+
+# Information for public repository in cimengine. See: https://github.com/CIMEngine/MapList
+# [[processing.public]]
+# name = "Sample Map"
+# geo = "https://example.com/geo.geojson"
+# countries = "https://example.com/countries.json"
+
+[[nature]]
+id = "water"
+color = "#75cff0"
+
+[[nature]]
+id = "sand"
+color = "#efe9e1"
+
+[[nature]]
+id = "grass"
+color = "#d1e6be"
