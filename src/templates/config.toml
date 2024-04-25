@@ -1,18 +1,16 @@
-[country]
+[main]
 # Order matters when building countries. This affects the processing of area intersections
 layers = ["sample_country_id"]
 
 [[processing]]
-output_folder = "out"
-countries_file = "countries.json"
-geo_file = "geo.geojson"
+output_folder = "./out/map"
 
-# generate_colors = false
 # show_markers = false
 
 # Information for public repository in cimengine. See: https://github.com/CIMEngine/MapList
 # [processing.public]
 # name = "Sample Map"
+# description = "This is a sample map"
 # geo = "https://example.com/geo.geojson"
 # countries = "https://example.com/countries.json"
 
@@ -22,9 +20,14 @@ geo_file = "geo.geojson"
 # include = [] # [] = not filtered
 # exclude = ["test", "test2"]
 
+# Rewrite properties of all countries. All fields are optional.
 # [processing.countries_rewrite]
 # name = "name"
 # color = "#000000"
+# description = "description"
+# foundation_date = "2024-01-01"
+# flag = "https://example.com/flag.png"
+# about = "https://example.com/about.html"
 
 # Nature layers
 [[nature]]

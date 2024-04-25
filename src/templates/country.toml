@@ -2,4 +2,8 @@ name = "Sample Country"
 description = "This is a sample country"
 foundation_date = "2024-01-01"
 flag = "https://example.com/flag.png"
-about = "https://example.com/about.html"
+fill = "#000000"
+stroke = "#000000"
+
+# about = "https://example.com/about.html"
+# tags = ["test", "test2"]

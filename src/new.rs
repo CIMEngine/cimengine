@@ -1,7 +1,10 @@
 use std::{fs, path::Path};
 use toml_edit::{value, DocumentMut, Value};
 
-use crate::types::{Config, Country, NewCommands};
+use crate::{
+    types::{CountryConfig, NewCommands},
+    utils::{hash_hex_color, read_config},
+};
 
 pub fn new(cmd: NewCommands) {
     match cmd {
@@ -12,39 +15,37 @@ pub fn new(cmd: NewCommands) {
             foundation_date,
             flag,
             about,
+            fill,
+            stroke,
         } => {
             let name = name.unwrap_or_default();
             let description = description.unwrap_or_default();
             let foundation_date = foundation_date.unwrap_or_default();
             let flag = flag.unwrap_or_default();
-            let about = about;
+            let fill = fill.unwrap_or_else(|| hash_hex_color(id.clone() + "_fill"));
+            let stroke = stroke.unwrap_or_else(|| hash_hex_color(id.clone() + "_stroke"));
 
-            let country = Country {
+            let country = CountryConfig {
                 name: name.clone(),
                 description,
                 foundation_date,
                 flag,
                 about,
-                tags: Some(vec![]),
+                fill,
+                stroke,
+                tags: None,
             };
 
             let config = fs::read_to_string("config.toml").unwrap();
 
             // Validate config
-            let c = toml::from_str::<Config>(&config);
-
-            match c {
-                Ok(c) => c,
-                Err(err) => {
-                    panic!("Invalid config: {}", err);
-                }
-            };
+            read_config();
 
             // Get actual config
             let mut config = config.parse::<DocumentMut>().unwrap();
 
             // Add country to layers
-            let layers = config["country"]["layers"].clone().into_value().unwrap();
+            let layers = config["main"]["layers"].clone().into_value().unwrap();
 
             let layers = if let Value::Array(mut layers) = layers {
                 layers.push(&id);
@@ -53,7 +54,7 @@ pub fn new(cmd: NewCommands) {
                 panic!("layers is not an array");
             };
 
-            config["country"]["layers"] = value(layers);
+            config["main"]["layers"] = value(layers);
 
             fs::write("config.toml", config.to_string()).unwrap();
 

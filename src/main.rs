@@ -4,6 +4,7 @@ mod build;
 mod init;
 mod new;
 mod types;
+mod utils;
 
 use types::Commands;
 
