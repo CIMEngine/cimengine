@@ -16,9 +16,7 @@ output_folder = "./out/map"
 
 # Include or exclude countries based on tags
 # Glob syntax is supported
-# [processing.tags]
-# include = [] # [] = not filtered
-# exclude = ["test", "test2"]
+# tags = ["test-[!2]"]
 
 # Rewrite properties of all countries. All fields are optional.
 # [processing.countries_rewrite]

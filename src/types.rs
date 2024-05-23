@@ -74,15 +74,9 @@ pub struct ProcessingConfig {
     pub show_markers: Option<bool>,
     pub output_folder: String,
 
-    pub tags: Option<ProcessingTagsConfig>,
+    pub tags: Option<Vec<String>>,
     pub countries_rewrite: Option<CountryRewriteConfig>,
     pub public: Option<PublicConfig>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ProcessingTagsConfig {
-    pub include: Option<Vec<String>>,
-    pub exclude: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
