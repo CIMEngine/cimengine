@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand};
-use geo::{BoundingRect, Geometry, MultiPolygon, Point, Polygon};
+use geo::{Geometry, MultiPolygon};
+use geo::{Point, Polygon};
 use geojson::{Feature, FeatureCollection, Value};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -127,8 +128,8 @@ pub struct Marker {
     pub ty: MarkerType,
 }
 
-impl Marker {
-    pub fn to_feature(&self) -> geojson::Feature {
+impl ToFeature for Marker {
+    fn to_feature(&self) -> geojson::Feature {
         geojson::Feature {
             geometry: Some(geojson::Geometry::new(Value::Point(vec![
                 self.coordinates.x(),
@@ -171,25 +172,146 @@ pub enum Territory {
     MultiPolygon(MultiPolygon),
 }
 
-impl Territory {
-    pub fn to_feature(&self) -> geojson::Feature {
-        match self {
-            Territory::Polygon(p) => geojson::Feature {
-                geometry: Some(geojson::Geometry::new(p.into())),
-                properties: None,
+impl ToTerritory for MultiPolygon {
+    fn to_territory(&self) -> Territory {
+        Territory::MultiPolygon(self.clone())
+    }
+}
 
-                bbox: None,
-                id: None,
-                foreign_members: None,
-            },
-            Territory::MultiPolygon(mp) => geojson::Feature {
-                geometry: Some(geojson::Geometry::new(mp.into())),
-                properties: None,
+impl ToCountryFeature for MultiPolygon {
+    fn to_country_feature(&self, id: &String, config: &CountryConfig) -> geojson::Feature {
+        geojson::Feature {
+            geometry: Some(geojson::Geometry::new((self).into())),
+            properties: Some(
+                serde_json::Map::from_iter([
+                    ("id".to_owned(), json!(id)),
+                    ("type".to_owned(), json!("country")),
+                    ("fill".to_owned(), json!(config.fill)),
+                    ("stroke".to_owned(), json!(config.stroke)),
+                    ("tags".to_owned(), json!(config.tags)),
+                ])
+                .into(),
+            ),
 
-                bbox: None,
-                id: None,
-                foreign_members: None,
-            },
+            bbox: None,
+            id: None,
+            foreign_members: None,
         }
     }
+}
+
+impl ToFeatures for Vec<Marker> {
+    fn to_features(&self) -> Vec<geojson::Feature> {
+        self.iter().map(|m| m.to_feature()).collect()
+    }
+}
+
+impl ToCollection for Vec<geojson::Feature> {
+    fn to_collection(self) -> geojson::FeatureCollection {
+        geojson::FeatureCollection {
+            features: self,
+            bbox: None,
+            foreign_members: None,
+        }
+    }
+}
+
+impl ToSplitGeo for FeatureCollection {
+    fn split_geo(&self) -> (Vec<Marker>, Vec<Territory>) {
+        let mut markers: Vec<Marker> = vec![];
+        let mut territories: Vec<Territory> = vec![];
+
+        self.features.iter().for_each(|f| {
+            let properties = f.properties.clone().unwrap();
+
+            let geometry: Geometry = f.geometry.clone().unwrap().try_into().unwrap();
+
+            match geometry {
+                Geometry::Point(p) => {
+                    let ty = match properties
+                        .get("type")
+                        .expect("Missing marker type")
+                        .to_string()
+                        .trim_matches('"')
+                    {
+                        "capital" | "capital-city" => MarkerType::Capital,
+                        "city" => MarkerType::City,
+                        "landmark" => MarkerType::Landmark,
+
+                        t => panic!("Invalid marker type: {}", t),
+                    };
+
+                    markers.push(Marker {
+                        coordinates: p,
+                        title: properties
+                            .get("title")
+                            .expect("Missing marker title")
+                            .to_string(),
+                        description: properties
+                            .get("description")
+                            .unwrap_or(&json!(""))
+                            .to_string(),
+                        ty,
+                    })
+                }
+
+                Geometry::MultiPolygon(mp) => territories.push(Territory::MultiPolygon(mp)),
+
+                Geometry::Polygon(p) => territories.push(Territory::Polygon(p)),
+
+                _ => panic!("Unexpected geometry type"),
+            }
+        });
+
+        (markers, territories)
+    }
+}
+
+impl UnsplitGeo for (Vec<Marker>, Feature) {
+    fn unsplit_geo(self) -> FeatureCollection {
+        let (markers, territories) = self;
+
+        let mut features: Vec<geojson::Feature> = markers.to_features();
+        features.push(territories);
+
+        features.to_collection()
+    }
+}
+
+impl ToMultiPolygon for Polygon {
+    fn to_mp(&self) -> MultiPolygon {
+        MultiPolygon::new(vec![self.clone()])
+    }
+}
+
+pub trait ToFeature {
+    fn to_feature(&self) -> geojson::Feature;
+}
+
+pub trait ToFeatures {
+    fn to_features(&self) -> Vec<geojson::Feature>;
+}
+
+pub trait ToCountryFeature {
+    fn to_country_feature(&self, id: &String, config: &CountryConfig) -> geojson::Feature;
+}
+
+pub trait ToCollection {
+    fn to_collection(self) -> geojson::FeatureCollection;
+}
+
+pub trait ToSplitGeo {
+    fn split_geo(&self) -> (Vec<Marker>, Vec<Territory>);
+}
+
+pub trait ToTerritory {
+    fn to_territory(&self) -> Territory;
+}
+
+pub trait UnsplitGeo {
+    fn unsplit_geo(self) -> FeatureCollection;
+}
+
+pub trait ToMultiPolygon {
+    fn to_mp(&self) -> MultiPolygon;
 }
