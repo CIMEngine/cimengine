@@ -144,7 +144,7 @@ impl ToFeature for Marker {
                 serde_json::Map::from_iter([
                     ("title".to_owned(), json!(self.title)),
                     ("description".to_owned(), json!(self.description)),
-                    ("marker-type".to_owned(), json!(self.ty.to_str())),
+                    ("type".to_owned(), json!(self.ty.to_str())),
                 ])
                 .into(),
             ),
