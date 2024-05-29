@@ -5,25 +5,25 @@ use serde_json::json;
 use wax::{Glob, Pattern};
 
 use crate::{
-    types::CountryData,
-    utils::{get_country, read_config},
+    types::{CountryData, ToFeature, ToFeatures},
+    utils::{diff_countries, get_country, read_config},
 };
 
 pub fn build() {
     let config = read_config();
 
     for processing_item in config.processing {
-        let mut features: Vec<Feature> = vec![];
+        let features: Vec<Feature> = vec![];
 
         let out_folder = Path::new(&processing_item.output_folder);
-
-        let mut countries: Vec<CountryData> = vec![];
 
         let tags = processing_item.tags.unwrap_or(vec!["*".to_string()]);
         let globs: Vec<Glob> = tags.iter().map(|tag| Glob::new(tag).unwrap()).collect();
 
+        let mut countries: Vec<CountryData> = vec![];
+
         for country_id in &config.main.layers {
-            let mut country = get_country(country_id.to_owned());
+            let country = get_country(country_id.to_owned());
 
             let mut matches = false;
             for glob in &globs {
@@ -38,17 +38,16 @@ pub fn build() {
                 continue;
             }
 
-            features.append(&mut country.geo.features);
             countries.push(country);
         }
 
-        // TODO: Country diff
-
         // TODO: Add country_rewrite support
-        // TODO: let countries = vec![rewrite_info];
+
+        let countries = diff_countries(countries);
 
         // TODO: Add nature support
 
+        // TODO: Create from Vec<CountryData>
         let feature_collection = FeatureCollection {
             bbox: None,
             features,

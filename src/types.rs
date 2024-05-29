@@ -112,9 +112,20 @@ pub struct CountryConfig {
 pub struct CountryData {
     pub id: String,
     pub config: CountryConfig,
-    pub geo: FeatureCollection,
+    pub land: MultiPolygon,
+    pub markers: Vec<Marker>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CountryPolyProps {
+    id: String,
+    r#type: String,
+    fill: String,
+    stroke: String,
+    tags: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Marker {
     pub coordinates: Point,
     pub title: String,
@@ -145,6 +156,7 @@ impl ToFeature for Marker {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum MarkerType {
     Capital,
     City,
@@ -172,20 +184,11 @@ impl ToTerritory for MultiPolygon {
     }
 }
 
-impl ToCountryFeature for MultiPolygon {
-    fn to_country_feature(&self, id: &String, config: &CountryConfig) -> geojson::Feature {
+impl ToFeature for MultiPolygon {
+    fn to_feature(&self) -> geojson::Feature {
         geojson::Feature {
             geometry: Some(geojson::Geometry::new((self).into())),
-            properties: Some(
-                serde_json::Map::from_iter([
-                    ("id".to_owned(), json!(id)),
-                    ("type".to_owned(), json!("country")),
-                    ("fill".to_owned(), json!(config.fill)),
-                    ("stroke".to_owned(), json!(config.stroke)),
-                    ("tags".to_owned(), json!(config.tags)),
-                ])
-                .into(),
-            ),
+            properties: None,
 
             bbox: None,
             id: None,

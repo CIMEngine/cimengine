@@ -1,11 +1,11 @@
-use std::{fs, path::Path};
+use std::{fs, marker, path::Path};
 
 use geo::{BooleanOps, MultiPolygon};
-use geojson::{FeatureCollection, GeoJson};
+use geojson::{Feature, FeatureCollection, GeoJson};
 
 use crate::types::{
-    Config, CountryConfig, CountryData, Territory, ToCountryFeature, ToMultiPolygon, ToSplitGeo,
-    UnsplitGeo,
+    Config, CountryConfig, CountryData, Marker, Territory, ToCollection, ToCountryFeature,
+    ToFeature, ToFeatures, ToMultiPolygon, ToSplitGeo, UnsplitGeo,
 };
 
 pub fn read_config() -> Config {
@@ -37,29 +37,42 @@ pub fn get_country(id: String) -> CountryData {
         _ => panic!("Invalid geojson, expected FeatureCollection"),
     };
 
+    let (markers, territories) = geo.split_geo();
+    let geo = dissolve_territories(territories);
+
     CountryData {
         id: id.clone(),
         config: config.clone(),
-        geo: dissolve_territory(geo, id, config),
+        land: geo,
+        markers,
     }
 }
 
-pub fn dissolve_territory(
-    geo: FeatureCollection,
-    id: String,
-    config: CountryConfig,
-) -> FeatureCollection {
-    let (markers, territories) = geo.split_geo();
-
+pub fn dissolve_territories(territories: Vec<Territory>) -> MultiPolygon {
     let dissolved = territories
         .iter()
         .fold(MultiPolygon::new(vec![]), |a, b| match b {
             Territory::Polygon(p) => a.union(&p.to_mp()),
             Territory::MultiPolygon(mp) => a.union(mp),
-        })
-        .to_country_feature(&id, &config);
+        });
 
-    (markers, dissolved).unsplit_geo()
+    dissolved
+}
+
+pub fn diff_countries(countries: Vec<CountryData>) -> Vec<CountryData> {
+    let mut countries = countries;
+
+    for i in 0..countries.len() {
+        for j in 0..countries.len() {
+            if i == j {
+                continue;
+            }
+
+            countries[i].land = countries[i].land.difference(&countries[j].land);
+        }
+    }
+
+    countries
 }
 
 pub fn hash_hex_color(s: String) -> String {
