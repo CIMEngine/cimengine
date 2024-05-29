@@ -5,7 +5,7 @@ use serde_json::json;
 use wax::{Glob, Pattern};
 
 use crate::{
-    types::{CountryData, ToFeature, ToFeatures},
+    types::{CountryData, ToCollection, ToFeature, ToFeatures},
     utils::{diff_countries, get_country, read_config},
 };
 
@@ -47,25 +47,19 @@ pub fn build() {
 
         // TODO: Add nature support
 
-        // TODO: Create from Vec<CountryData>
-        let feature_collection = FeatureCollection {
-            bbox: None,
-            features,
-            foreign_members: None,
-        }
-        .to_string();
-
-        let countries = serde_json::to_string_pretty(&serde_json::Map::from_iter(
+        let countries_json = serde_json::to_string_pretty(&serde_json::Map::from_iter(
             countries
                 .iter()
                 .map(|country| (country.id.clone(), json!(country.config))),
         ))
         .unwrap();
 
+        let feature_collection = countries.to_collection().to_string();
+
         fs::create_dir_all(out_folder).unwrap();
 
         fs::write(out_folder.join("geo.geojson"), feature_collection).unwrap();
-        fs::write(out_folder.join("countries.json"), countries).unwrap();
+        fs::write(out_folder.join("countries.json"), countries_json).unwrap();
 
         if let Some(public) = processing_item.public {
             let public = serde_json::to_string(&public).unwrap();

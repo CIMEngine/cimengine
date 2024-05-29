@@ -203,6 +203,46 @@ impl ToFeatures for Vec<Marker> {
     }
 }
 
+impl ToFeatures for CountryData {
+    fn to_features(&self) -> Vec<geojson::Feature> {
+        let land = geojson::Feature {
+            geometry: Some(geojson::Geometry::from(&self.land)),
+            properties: Some(
+                serde_json::Map::from_iter([
+                    ("id".to_owned(), json!(self.id)),
+                    ("type".to_owned(), json!("country")),
+                    ("fill".to_owned(), json!(self.config.fill)),
+                    ("stroke".to_owned(), json!(self.config.stroke)),
+                    ("tags".to_owned(), json!(self.config.tags)),
+                ])
+                .into(),
+            ),
+
+            bbox: None,
+            id: None,
+            foreign_members: None,
+        };
+
+        let mut features = vec![land];
+        features.extend(self.markers.to_features());
+
+        features
+    }
+}
+
+impl ToCollection for Vec<CountryData> {
+    fn to_collection(self) -> geojson::FeatureCollection {
+        geojson::FeatureCollection {
+            features: self
+                .iter()
+                .flat_map(|c| c.to_features())
+                .collect::<Vec<geojson::Feature>>(),
+            bbox: None,
+            foreign_members: None,
+        }
+    }
+}
+
 impl ToCollection for Vec<geojson::Feature> {
     fn to_collection(self) -> geojson::FeatureCollection {
         geojson::FeatureCollection {
@@ -261,17 +301,6 @@ impl ToSplitGeo for FeatureCollection {
         });
 
         (markers, territories)
-    }
-}
-
-impl UnsplitGeo for (Vec<Marker>, Feature) {
-    fn unsplit_geo(self) -> FeatureCollection {
-        let (markers, territories) = self;
-
-        let mut features: Vec<geojson::Feature> = markers.to_features();
-        features.push(territories);
-
-        features.to_collection()
     }
 }
 

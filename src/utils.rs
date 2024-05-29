@@ -26,7 +26,7 @@ pub fn get_country(id: String) -> CountryData {
 
     let config = match config {
         Ok(c) => c,
-        Err(err) => panic!("Invalid config: {}", err),
+        Err(err) => panic!("Invalid config: {err}"),
     };
 
     let geo_str = fs::read_to_string(country_folder.join("country.geojson")).unwrap();
