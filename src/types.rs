@@ -23,12 +23,6 @@ pub enum Commands {
         #[clap(default_value = "map")]
         name: String,
     },
-    /// Fix geospatial file
-    Fix {
-        /// Path to geospatial file supported by cimengine
-        #[clap(short, long)]
-        path: String,
-    },
     /// Utility for creating countries, roads, etc.
     New {
         #[command(subcommand)]
