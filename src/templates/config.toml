@@ -8,6 +8,8 @@ output_folder = "./out/map"
 # show_markers = false
 
 # Information for public repository in cimengine. See: https://github.com/CIMEngine/MapList
+# If you want to add your map to MapList, add link to public.json file in repository at index.json
+# {..., "id": { "external": "https://example.com/index.json" } }
 # [processing.public]
 # name = "Sample Map"
 # description = "This is a sample map"

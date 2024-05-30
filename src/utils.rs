@@ -1,12 +1,9 @@
-use std::{fs, marker, path::Path};
+use std::{fs, path::Path};
 
 use geo::{BooleanOps, MultiPolygon};
-use geojson::{Feature, FeatureCollection, GeoJson};
+use geojson::GeoJson;
 
-use crate::types::{
-    Config, CountryConfig, CountryData, Marker, Territory, ToCollection, ToCountryFeature,
-    ToFeature, ToFeatures, ToMultiPolygon, ToSplitGeo, UnsplitGeo,
-};
+use crate::types::{Config, CountryConfig, CountryData, Territory, ToMultiPolygon, ToSplitGeo};
 
 pub fn read_config() -> Config {
     let c = toml::from_str::<Config>(&fs::read_to_string("config.toml").unwrap());

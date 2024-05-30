@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 use geo::{Geometry, MultiPolygon};
 use geo::{Point, Polygon};
-use geojson::{Feature, FeatureCollection, Value};
+use geojson::{FeatureCollection, Value};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 

@@ -1,11 +1,10 @@
 use std::{fs, path::Path, time};
 
-use geojson::{Feature, FeatureCollection};
 use serde_json::json;
 use wax::{Glob, Pattern};
 
 use crate::{
-    types::{CountryData, ToCollection, ToFeature, ToFeatures},
+    types::{CountryData, ToCollection},
     utils::{diff_countries, get_country, read_config},
 };
 
@@ -15,11 +14,13 @@ pub fn build() {
     let total_time = time::Instant::now();
 
     for processing_item in config.processing {
+        println!("--- {} ---", processing_item.output_folder);
+
         let processed_time = time::Instant::now();
 
         let out_folder = Path::new(&processing_item.output_folder);
 
-        let tags = processing_item.tags.unwrap_or(vec!["*".to_string()]);
+        let tags = processing_item.tags.unwrap_or(vec![]);
         let globs: Vec<Glob> = tags.iter().map(|tag| Glob::new(tag).unwrap()).collect();
 
         let mut countries: Vec<CountryData> = vec![];
@@ -27,23 +28,36 @@ pub fn build() {
         {
             let dissolved_time = time::Instant::now();
 
-            for country_id in &config.main.layers {
-                let country = get_country(country_id.to_owned());
+            if tags.len() == 0 {
+                for country_id in &config.main.layers {
+                    countries.push(get_country(country_id.to_owned()));
+                }
+            } else {
+                for country_id in &config.main.layers {
+                    let country = get_country(country_id.to_owned());
 
-                let mut matches = false;
-                for glob in &globs {
-                    for tag in &country.config.tags.clone().unwrap_or(vec!["*".to_owned()]) {
-                        if glob.is_match(tag.as_str()) {
-                            matches = true;
+                    match &country.config.tags {
+                        Some(tags) => {
+                            let mut matches = false;
+                            for glob in &globs {
+                                for tag in tags {
+                                    if glob.is_match(tag.as_str()) {
+                                        matches = true;
+                                    }
+                                }
+                            }
+
+                            if !matches {
+                                continue;
+                            }
+
+                            countries.push(country);
+                        }
+                        None => {
+                            continue;
                         }
                     }
                 }
-
-                if !matches {
-                    continue;
-                }
-
-                countries.push(country);
             }
 
             println!("Dissolved in {:?}", dissolved_time.elapsed());
@@ -62,6 +76,7 @@ pub fn build() {
         };
 
         // TODO: Add nature support
+
         {
             let generated_time = time::Instant::now();
             let countries_json = serde_json::to_string_pretty(&serde_json::Map::from_iter(
@@ -88,7 +103,13 @@ pub fn build() {
             println!("Generated files in {:?}", generated_time.elapsed());
         }
 
-        println!("Processed in {:?}\n---\n", processed_time.elapsed());
+        let processed = format!("{:?}", processed_time.elapsed());
+
+        println!(
+            "--- {} {}---\n",
+            processed,
+            "-".repeat(processing_item.output_folder.len() - processed.len())
+        );
     }
 
     println!("Total time: {:?}", total_time.elapsed());
