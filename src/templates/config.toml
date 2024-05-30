@@ -30,16 +30,3 @@ output_folder = "./out/map"
 # foundation_date = "2024-01-01"
 # flag = "https://example.com/flag.png"
 # about = "https://example.com/about.html"
-
-# Additional nature layers
-[[nature]]
-id = "water"
-color = "#75cff0"
-
-[[nature]]
-id = "sand"
-color = "#efe9e1"
-
-[[nature]]
-id = "grass"
-color = "#d1e6be"

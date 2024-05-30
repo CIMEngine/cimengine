@@ -242,13 +242,16 @@ impl ToFeatures for CountryData {
 impl ToCollection for Vec<CountryData> {
     fn to_collection(self) -> geojson::FeatureCollection {
         geojson::FeatureCollection {
-            features: self
-                .iter()
-                .flat_map(|c| c.to_features())
-                .collect::<Vec<geojson::Feature>>(),
+            features: self.to_features(),
             bbox: None,
             foreign_members: None,
         }
+    }
+}
+
+impl ToFeatures for Vec<CountryData> {
+    fn to_features(&self) -> Vec<geojson::Feature> {
+        self.iter().flat_map(|c| c.to_features()).collect()
     }
 }
 

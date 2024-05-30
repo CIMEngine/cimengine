@@ -3,7 +3,7 @@ use std::{fs, path::Path, time};
 use serde_json::json;
 
 use crate::{
-    types::{CountryData, ToCollection},
+    types::{CountryData, ToCollection, ToFeatures},
     utils::{
         diff_countries, get_country, is_match, read_config, rewrite_if_some, rewrite_if_some_option,
     },
@@ -81,8 +81,6 @@ pub fn build() {
 
             countries
         };
-
-        // TODO: Add nature support
 
         {
             let generated_time = time::Instant::now();
