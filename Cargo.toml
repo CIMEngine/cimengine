@@ -1,9 +1,15 @@
 [package]
-name = "cimengine-build-tools"
+name = "cimengine"
 version = "2.0.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["artegoser"]
+license = "MIT"
+description = "Country info map engine build tools"
+repository = "https://github.com/CIMEngine/cimengine"
+readme = "./README.md"
+keywords = ["geo", "geospatial", "build", "tools", "cli"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
