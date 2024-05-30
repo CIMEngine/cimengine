@@ -48,7 +48,7 @@ pub fn new(cmd: NewCommands) {
             let layers = config["main"]["layers"].clone().into_value().unwrap();
 
             let layers = if let Value::Array(mut layers) = layers {
-                layers.push(&id);
+                layers.insert(0, &id);
                 layers
             } else {
                 panic!("layers is not an array");
