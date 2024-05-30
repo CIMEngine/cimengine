@@ -2,6 +2,7 @@ use std::{fs, path::Path};
 
 use geo::{BooleanOps, MultiPolygon};
 use geojson::GeoJson;
+use wax::{Glob, Pattern};
 
 use crate::types::{Config, CountryConfig, CountryData, Territory, ToMultiPolygon, ToSplitGeo};
 
@@ -76,4 +77,44 @@ pub fn hash_hex_color(s: String) -> String {
     let hex_str = format!("{:x}", xxhash_rust::xxh3::xxh3_64(s.as_bytes()));
 
     format!("#{}", hex_str.chars().take(6).collect::<String>())
+}
+
+pub fn is_match(tags: &Option<Vec<String>>, globs: &Vec<Glob>) -> bool {
+    if globs.len() == 0 {
+        return true;
+    }
+
+    match tags {
+        Some(tags) => {
+            let mut matches = false;
+            for glob in globs {
+                for tag in tags {
+                    if glob.is_match(tag.as_str()) {
+                        matches = true;
+                    }
+                }
+            }
+
+            matches
+        }
+        None => true,
+    }
+}
+
+pub fn rewrite_if_some<T>(value: Option<T>, rewrite: &mut T) {
+    match value {
+        Some(value) => {
+            *rewrite = value;
+        }
+        None => {}
+    }
+}
+
+pub fn rewrite_if_some_option<T>(value: Option<T>, rewrite: &mut Option<T>) {
+    match value {
+        Some(value) => {
+            *rewrite = Some(value);
+        }
+        None => {}
+    }
 }

@@ -1,12 +1,14 @@
 use std::{fs, path::Path, time};
 
 use serde_json::json;
-use wax::{Glob, Pattern};
 
 use crate::{
     types::{CountryData, ToCollection},
-    utils::{diff_countries, get_country, read_config},
+    utils::{
+        diff_countries, get_country, is_match, read_config, rewrite_if_some, rewrite_if_some_option,
+    },
 };
+use wax::Glob;
 
 pub fn build() {
     let config = read_config();
@@ -28,49 +30,54 @@ pub fn build() {
         {
             let dissolved_time = time::Instant::now();
 
-            if tags.len() == 0 {
-                for country_id in &config.main.layers {
-                    countries.push(get_country(country_id.to_owned()));
-                }
-            } else {
-                for country_id in &config.main.layers {
-                    let country = get_country(country_id.to_owned());
+            for country_id in &config.main.layers {
+                let country = get_country(country_id.to_owned());
 
-                    match &country.config.tags {
-                        Some(tags) => {
-                            let mut matches = false;
-                            for glob in &globs {
-                                for tag in tags {
-                                    if glob.is_match(tag.as_str()) {
-                                        matches = true;
-                                    }
-                                }
-                            }
-
-                            if !matches {
-                                continue;
-                            }
-
-                            countries.push(country);
-                        }
-                        None => {
-                            continue;
-                        }
-                    }
+                if is_match(&country.config.tags, &globs) {
+                    countries.push(country);
                 }
             }
 
             println!("Dissolved in {:?}", dissolved_time.elapsed());
         }
 
-        // TODO: Add country_rewrite support
-
-        let countries = {
+        let countries: Vec<CountryData> = {
             let diff_time = time::Instant::now();
 
-            let countries = diff_countries(countries);
+            let mut countries = diff_countries(countries);
 
             println!("Diffed in {:?}", diff_time.elapsed());
+
+            countries.iter_mut().for_each(|c| {
+                if !processing_item.show_markers.unwrap_or(true) {
+                    c.markers = vec![];
+                }
+
+                for country_rewrite in processing_item.countries_rewrite.clone().unwrap_or(vec![]) {
+                    let tags = country_rewrite.tags.unwrap_or(vec![]);
+                    let globs: Vec<Glob> = tags.iter().map(|tag| Glob::new(tag).unwrap()).collect();
+
+                    if is_match(&c.config.tags, &globs) {
+                        rewrite_if_some(country_rewrite.properties.name, &mut c.config.name);
+                        rewrite_if_some(
+                            country_rewrite.properties.description,
+                            &mut c.config.description,
+                        );
+                        rewrite_if_some(
+                            country_rewrite.properties.foundation_date,
+                            &mut c.config.foundation_date,
+                        );
+                        rewrite_if_some(country_rewrite.properties.flag, &mut c.config.flag);
+                        rewrite_if_some_option(
+                            country_rewrite.properties.about,
+                            &mut c.config.about,
+                        );
+                        rewrite_if_some(country_rewrite.properties.fill, &mut c.config.fill);
+                        rewrite_if_some(country_rewrite.properties.stroke, &mut c.config.stroke);
+                        rewrite_if_some_option(country_rewrite.properties.tags, &mut c.config.tags);
+                    }
+                }
+            });
 
             countries
         };

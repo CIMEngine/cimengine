@@ -20,8 +20,10 @@ output_folder = "./out/map"
 # Glob syntax is supported
 # tags = ["test-[!2]"]
 
-# Rewrite properties of all countries. All fields are optional.
-# [processing.countries_rewrite]
+# Rewrite properties of countries by tags. All fields except `tags` are optional.
+# [[processing.countries_rewrite]]
+# tags = ["test"]
+# [processing.countries_rewrite.properties]
 # name = "name"
 # color = "#000000"
 # description = "description"
@@ -29,7 +31,7 @@ output_folder = "./out/map"
 # flag = "https://example.com/flag.png"
 # about = "https://example.com/about.html"
 
-# Nature layers
+# Additional nature layers
 [[nature]]
 id = "water"
 color = "#75cff0"

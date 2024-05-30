@@ -75,17 +75,26 @@ pub struct ProcessingConfig {
     pub output_folder: String,
 
     pub tags: Option<Vec<String>>,
-    pub countries_rewrite: Option<CountryRewriteConfig>,
+    pub countries_rewrite: Option<Vec<CountryRewriteConfig>>,
     pub public: Option<PublicConfig>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CountryRewriteConfig {
+    pub tags: Option<Vec<String>>,
+    pub properties: CountryRewriteConfigProps,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CountryRewriteConfigProps {
     pub name: Option<String>,
     pub description: Option<String>,
     pub foundation_date: Option<String>,
     pub flag: Option<String>,
+    pub fill: Option<String>,
+    pub stroke: Option<String>,
     pub about: Option<String>,
+    pub tags: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
